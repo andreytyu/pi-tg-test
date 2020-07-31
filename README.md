@@ -1,6 +1,6 @@
 # pi-tg-test
 
-`git pull https://github.com/andreytyu/pi-tg-test.git`
+`git clone https://github.com/andreytyu/pi-tg-test.git`
 
 `cd pi-tg-test`
 
