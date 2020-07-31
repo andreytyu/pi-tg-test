@@ -27,17 +27,17 @@ def cpu_temp_check(update, context):
 def get_temp_hourly(update, context):
     """Add a job to the queue."""
     chat_id = update.message.chat_id
-    try:
-        # args[0] should contain the time for the timer in seconds
-        due = 10
-        update.message.reply_text('Hourly CPU temp check on')
 
-        # Add job to queue and stop current one if there is a timer already
-        if 'job' in context.chat_data:
-            old_job = context.chat_data['job']
-            old_job.schedule_removal()
-        new_job = context.job_queue.run_repeating(cpu_temp_check, due, 1, context=chat_id)
-        context.chat_data['job'] = new_job
+    # args[0] should contain the time for the timer in seconds
+    due = 10
+    update.message.reply_text('Hourly CPU temp check on')
+
+    # Add job to queue and stop current one if there is a timer already
+    if 'job' in context.chat_data:
+        old_job = context.chat_data['job']
+        old_job.schedule_removal()
+    new_job = context.job_queue.run_repeating(cpu_temp_check, due, 1, context=chat_id)
+    context.chat_data['job'] = new_job
 
 
 def main():
