@@ -24,14 +24,14 @@ def cpu_temp_check(update, context):
     output, error = process.communicate()
     update.message.reply_text(output.decode("utf-8"))
 
-def cpu_temp_check_no_up(context):
+def send_cpu_temp_msg(context):
     bash_command = 'vcgencmd measure_temp'
     process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     job = context.job
     context.bot.send_message(job.context, text=output.decode("utf-8"))
 
-def get_temp_hourly(update, context):
+def start_cpu_temp_check(update, context):
     """Add a job to the queue."""
     chat_id = update.message.chat_id
     # args[0] should contain the time for the timer in seconds
@@ -42,8 +42,21 @@ def get_temp_hourly(update, context):
     if 'job' in context.chat_data:
         old_job = context.chat_data['job']
         old_job.schedule_removal()
-    new_job = context.job_queue.run_repeating(cpu_temp_check_no_up, due, 1, context=chat_id)
+    new_job = context.job_queue.run_repeating(send_cpu_temp_msg, due, 1, context=chat_id)
     context.chat_data['job'] = new_job
+
+
+def stop_cpu_temp_check(update, context):
+    """Remove the job if the user changed their mind."""
+    if 'job' not in context.chat_data:
+        update.message.reply_text('You have no active CPU temperature check')
+        return
+
+    job = context.chat_data['job']
+    job.schedule_removal()
+    del context.chat_data['job']
+
+    update.message.reply_text('Stopped checking CPU temperature!')
 
 
 def main():
@@ -59,10 +72,11 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_command))
     dp.add_handler(CommandHandler("temp", cpu_temp_check))
-    dp.add_handler(CommandHandler("hour_temp", get_temp_hourly,
+    dp.add_handler(CommandHandler("start_cpu_check", start_cpu_temp_check,
                                   pass_args=True,
                                   pass_job_queue=True,
                                   pass_chat_data=True))
+    dp.add_handler(CommandHandler("stop_cpu_check", stop_cpu_temp_check, pass_chat_data=True))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
