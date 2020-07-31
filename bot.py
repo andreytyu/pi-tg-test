@@ -24,6 +24,12 @@ def cpu_temp_check(update, context):
     output, error = process.communicate()
     update.message.reply_text(output.decode("utf-8"))
 
+def cpu_temp_check_no_up(context):
+    bash_command = 'vcgencmd measure_temp'
+    process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    update.message.reply_text(output.decode("utf-8"))
+
 def get_temp_hourly(update, context):
     """Add a job to the queue."""
     chat_id = update.message.chat_id
@@ -35,7 +41,7 @@ def get_temp_hourly(update, context):
     if 'job' in context.chat_data:
         old_job = context.chat_data['job']
         old_job.schedule_removal()
-    new_job = context.job_queue.run_repeating(cpu_temp_check, due, 1, context=chat_id)
+    new_job = context.job_queue.run_repeating(cpu_temp_check_no_up, due, 1, context=chat_id)
     context.chat_data['job'] = new_job
 
 
