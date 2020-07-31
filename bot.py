@@ -28,6 +28,7 @@ def cpu_temp_check_no_up(context):
     bash_command = 'vcgencmd measure_temp'
     process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
+    job = context.job
     context.bot.send_message(job.context, text=output.decode("utf-8"))
 
 def get_temp_hourly(update, context):
