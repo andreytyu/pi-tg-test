@@ -1,3 +1,4 @@
+import subprocess
 from credentials import BOT_TOKEN
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -17,6 +18,12 @@ def echo(update, context):
     """Echo the user message."""
     update.message.reply_text(update.message.text)
 
+def cpu_temp_check(update, context):
+    bash_command = 'vcgencmd measure_temp'
+    process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    update.message.reply_text(output)
+
 
 def main():
     """Start the bot."""
@@ -24,7 +31,6 @@ def main():
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
     updater = Updater(BOT_TOKEN, use_context=True)
-
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
