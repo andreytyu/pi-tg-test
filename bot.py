@@ -24,6 +24,21 @@ def cpu_temp_check(update, context):
     output, error = process.communicate()
     update.message.reply_text(output.decode("utf-8"))
 
+def get_temp_hourly(update, context):
+    """Add a job to the queue."""
+    chat_id = update.message.chat_id
+    try:
+        # args[0] should contain the time for the timer in seconds
+        due = 10
+        update.message.reply_text('Hourly CPU temp check on')
+
+        # Add job to queue and stop current one if there is a timer already
+        if 'job' in context.chat_data:
+            old_job = context.chat_data['job']
+            old_job.schedule_removal()
+        new_job = context.job_queue.run_repeating(cpu_temp_check, due, 1, context=chat_id)
+        context.chat_data['job'] = new_job
+
 
 def main():
     """Start the bot."""
@@ -38,6 +53,9 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_command))
     dp.add_handler(CommandHandler("temp", cpu_temp_check))
+    dp.add_handler(CommandHandler("hour_temp", get_temp_hourly,
+                                  pass_job_queue=True,
+                                  pass_chat_data=True))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
