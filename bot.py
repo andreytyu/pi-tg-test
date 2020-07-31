@@ -27,7 +27,6 @@ def cpu_temp_check(update, context):
 def get_temp_hourly(update, context):
     """Add a job to the queue."""
     chat_id = update.message.chat_id
-
     # args[0] should contain the time for the timer in seconds
     due = 10
     update.message.reply_text('Hourly CPU temp check on')
@@ -54,6 +53,7 @@ def main():
     dp.add_handler(CommandHandler("help", help_command))
     dp.add_handler(CommandHandler("temp", cpu_temp_check))
     dp.add_handler(CommandHandler("hour_temp", get_temp_hourly,
+                                  pass_args=True,
                                   pass_job_queue=True,
                                   pass_chat_data=True))
 
