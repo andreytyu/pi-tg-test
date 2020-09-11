@@ -1,4 +1,6 @@
 from credentials import BOT_TOKEN
+
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram.ext import CommandHandler, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 ############################### Bot ############################################
