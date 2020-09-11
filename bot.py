@@ -39,22 +39,21 @@ def start_cpu_temp_check(update, context):
     update.message.reply_text('Hourly CPU temp check on')
 
     # Add job to queue and stop current one if there is a timer already
-    if 'job' in context.chat_data:
-        old_job = context.chat_data['job']
+    if 'cpu_check_job' in context.chat_data:
+        old_job = context.chat_data['cpu_check_job']
         old_job.schedule_removal()
     new_job = context.job_queue.run_repeating(send_cpu_temp_msg, due, 1, context=chat_id)
-    context.chat_data['job'] = new_job
+    context.chat_data['cpu_check_job'] = new_job
 
 
 def stop_cpu_temp_check(update, context):
     """Remove the job if the user changed their mind."""
-    if 'job' not in context.chat_data:
+    if 'cpu_check_job' not in context.chat_data:
         update.message.reply_text('You have no active CPU temperature check')
         return
-
-    job = context.chat_data['job']
+    job = context.chat_data['cpu_check_job']
     job.schedule_removal()
-    del context.chat_data['job']
+    del context.chat_data['cpu_check_job']
 
     update.message.reply_text('Stopped checking CPU temperature!')
 
